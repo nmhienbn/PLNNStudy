@@ -12,7 +12,7 @@ class QuizApp:
     def __init__(self, root):
         self.root = root
         self.root.title("Quiz Application")
-        self.center_window(650, 600)
+        self.center_window(700, 600)
         self.root.resizable(False, False)
         self.file_path = None
         self.questions = []
