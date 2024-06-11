@@ -19,6 +19,7 @@ class QuizApp:
         self.questions = []
         self.current_question_index = 0
         self.incorrect_count = 0
+        self.incorrect_questions = []
         self.all_questions = {}
         self.options_var = StringVar()
         self.options = []
@@ -55,6 +56,21 @@ class QuizApp:
         self.sheet_var = StringVar(self.root)
         self.sheet_menu = OptionMenu(top_frame, self.sheet_var, [])
         self.sheet_menu.pack(side=LEFT, padx=5)
+
+        self.num_questions_label = Label(
+            top_frame, text="Number of questions:", font=("Cambria", 12)
+        )
+        self.num_questions_label.pack(side=LEFT, padx=5)
+
+        self.num_questions_entry = Entry(
+            top_frame, font=("Cambria", 12), width=5
+        )
+        self.num_questions_entry.pack(side=LEFT, padx=5)
+
+        self.total_questions_label = Label(
+            top_frame, text="", font=("Cambria", 12)
+        )
+        self.total_questions_label.pack(side=LEFT, padx=5)
 
         self.start_button = Button(
             top_frame, text="Start Quiz", command=self.start_quiz, font=("Cambria", 12)
@@ -93,6 +109,15 @@ class QuizApp:
             font=("Cambria", 12),
         )
         self.next_button.pack(side=LEFT, padx=5)
+
+        self.retry_button = Button(
+            bottom_frame,
+            text="Retry Incorrect Questions",
+            command=self.retry_incorrect,
+            state=DISABLED,
+            font=("Cambria", 12),
+        )
+        self.retry_button.pack(side=LEFT, padx=5)
 
         self.result_label = Label(self.root, text="")
         self.result_label.pack(pady=10)
@@ -239,9 +264,20 @@ class QuizApp:
             messagebox.showerror("Error", "Please select a sheet")
             return
         self.questions = self.all_questions[selected_sheet]
-        random.shuffle(self.questions)
+        
+        # Get number of questions to ask
+        num_questions_str = self.num_questions_entry.get()
+        if num_questions_str.isdigit():
+            num_questions = int(num_questions_str)
+            if num_questions > len(self.questions):
+                num_questions = len(self.questions)
+        else:
+            num_questions = len(self.questions)
+        
+        self.questions = random.sample(self.questions, num_questions)
         self.current_question_index = 0
         self.incorrect_count = 0
+        self.incorrect_questions = []
         self.display_question()
 
     def display_question(self):
@@ -260,7 +296,7 @@ class QuizApp:
             justify="left",
             wraplength=800,
         )
-        self.options_var.set(None)  # Đặt lại giá trị của biến tùy chọn thành None
+        self.options_var.set(None)  # Reset the options variable to None
 
         choices = list(enumerate(q["choices"]))
 
@@ -295,9 +331,10 @@ class QuizApp:
 
         self.submit_button.config(state=NORMAL)
         self.next_button.config(state=DISABLED)
+        self.retry_button.config(state=DISABLED)
 
     def submit_answer(self):
-        if self.options_var.get() == "":
+        if self.options_var.get() == "" or self.options_var.get() == None:
             messagebox.showwarning("Warning", "Please select an answer")
             return
 
@@ -313,6 +350,7 @@ class QuizApp:
                 text="No correct answer", fg="red", font=("Cambria", 14, "bold")
             )
             self.incorrect_count += 1
+            self.incorrect_questions.append(self.questions[self.current_question_index])
         else:
             self.result_label.config(
                 text=f"Incorrect! The correct answer is {chr(65 + correct_option)}",
@@ -320,6 +358,7 @@ class QuizApp:
                 font=("Cambria", 14, "bold"),
             )
             self.incorrect_count += 1
+            self.incorrect_questions.append(self.questions[self.current_question_index])
 
         self.submit_button.config(state=DISABLED)
         self.next_button.config(state=NORMAL)
@@ -335,7 +374,7 @@ class QuizApp:
         score_percentage = (correct_answers / total_questions) * 100
 
         self.question_label.config(
-            text=f"Quiz Completed!\n\nTotal Questions: {total_questions}\nCorrect Answers: {correct_answers}\nScore: {score_percentage:.2f}%, font=('Cambria', 14, 'bold')"
+            text=f"Quiz Completed!\n\nTotal Questions: {total_questions}\nCorrect Answers: {correct_answers}\nScore: {score_percentage:.2f}%", font=('Cambria', 14, 'bold')
         )
 
         for widget in self.options_frame.winfo_children():
@@ -343,6 +382,17 @@ class QuizApp:
 
         self.submit_button.config(state=DISABLED)
         self.next_button.config(state=DISABLED)
+
+        if self.incorrect_questions:
+            self.retry_button.config(state=NORMAL)
+
+    def retry_incorrect(self):
+        self.questions = self.incorrect_questions
+        random.shuffle(self.questions)
+        self.current_question_index = 0
+        self.incorrect_count = 0
+        self.incorrect_questions = []
+        self.display_question()
 
 
 if __name__ == "__main__":
