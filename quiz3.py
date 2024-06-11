@@ -33,24 +33,32 @@ class QuizApp:
         self.root.geometry(f"{width}x{height}+{x}+{y}")
 
     def init_ui(self):
-        self.file_label = Label(self.root, text="No file selected", font=('Cambria', 12, 'bold'))
+        self.file_label = Label(
+            self.root, text="No file selected", font=("Cambria", 12, "bold")
+        )
         self.file_label.pack(pady=10)
 
         # Frame for Load File, Select Sheet, and Start Quiz buttons
         top_frame = Frame(self.root)
         top_frame.pack(pady=5)
 
-        self.load_button = Button(top_frame, text="Load File", command=self.choose_file, font=('Cambria', 12))
+        self.load_button = Button(
+            top_frame, text="Load File", command=self.choose_file, font=("Cambria", 12)
+        )
         self.load_button.pack(side=LEFT, padx=5)
 
-        self.sheet_label = Label(top_frame, text="Select a sheet:", font=('Cambria', 12, 'italic'))
+        self.sheet_label = Label(
+            top_frame, text="Select a sheet:", font=("Cambria", 12, "italic")
+        )
         self.sheet_label.pack(side=LEFT, padx=5)
 
         self.sheet_var = StringVar(self.root)
         self.sheet_menu = OptionMenu(top_frame, self.sheet_var, [])
         self.sheet_menu.pack(side=LEFT, padx=5)
 
-        self.start_button = Button(top_frame, text="Start Quiz", command=self.start_quiz, font=('Cambria', 12))
+        self.start_button = Button(
+            top_frame, text="Start Quiz", command=self.start_quiz, font=("Cambria", 12)
+        )
         self.start_button.pack(side=LEFT, padx=5)
 
         self.question_label = Label(
@@ -69,10 +77,21 @@ class QuizApp:
         bottom_frame = Frame(self.root)
         bottom_frame.pack(pady=5)
 
-        self.submit_button = Button(bottom_frame, text="Submit", command=self.submit_answer, font=('Cambria', 12))
+        self.submit_button = Button(
+            bottom_frame,
+            text="Submit",
+            command=self.submit_answer,
+            font=("Cambria", 12),
+        )
         self.submit_button.pack(side=LEFT, padx=5)
 
-        self.next_button = Button(bottom_frame, text="Next", command=self.next_question, state=DISABLED, font=('Cambria', 12))
+        self.next_button = Button(
+            bottom_frame,
+            text="Next",
+            command=self.next_question,
+            state=DISABLED,
+            font=("Cambria", 12),
+        )
         self.next_button.pack(side=LEFT, padx=5)
 
         self.result_label = Label(self.root, text="")
@@ -234,21 +253,43 @@ class QuizApp:
             return
 
         q = self.questions[self.current_question_index]
-        self.question_label.config(text=f"Q{self.current_question_index + 1}: {q['question']}", font=('Cambria', 14, 'bold'), anchor='w', justify='left', wraplength=800)
+        self.question_label.config(
+            text=f"Q{self.current_question_index + 1}: {q['question']}",
+            font=("Cambria", 14, "bold"),
+            anchor="w",
+            justify="left",
+            wraplength=800,
+        )
         self.options_var.set(None)  # Đặt lại giá trị của biến tùy chọn thành None
 
-        choices = list(enumerate(q['choices']))
+        choices = list(enumerate(q["choices"]))
 
         self.options = []
         for i, (original_idx, choice) in enumerate(choices):
             frame = Frame(self.options_frame)
-            frame.pack(fill='x', anchor='w', padx=5)
+            frame.pack(fill="x", anchor="w", padx=5)
 
-            label = Label(frame, text=f"{chr(65 + i)}.", font=('Cambria', 14, 'bold'))
-            label.pack(side='left')
+            label = Label(
+                frame, text=f"{chr(65 + i)}.", font=("Cambria", 14, "bold"), bg="white"
+            )
+            label.pack(side="left")
 
-            rb = Radiobutton(frame, text=choice, font=('Cambria', 14), variable=self.options_var, value=str(original_idx), anchor='w', wraplength=800, justify='left')
-            rb.pack(side='left', fill='x')
+            rb = Radiobutton(
+                frame,
+                text=choice,
+                font=("Cambria", 14),
+                variable=self.options_var,
+                value=str(original_idx),
+                anchor="w",
+                wraplength=800,
+                justify="left",
+                indicatoron=False,
+                # height=3,
+                width=810,
+                selectcolor="#C6FFFD",
+                bg="white",
+            )
+            rb.pack(side="left", fill="x")
 
             self.options.append(rb)
 
@@ -264,14 +305,19 @@ class QuizApp:
         correct_option = self.questions[self.current_question_index]["correct_answer"]
 
         if selected_option == correct_option:
-            self.result_label.config(text="Correct!", fg="green", font=('Cambria', 14, 'bold'))
+            self.result_label.config(
+                text="Correct!", fg="green", font=("Cambria", 14, "bold")
+            )
         elif correct_option is None:
-            self.result_label.config(text="No correct answer", fg="red", font=('Cambria', 14, 'bold'))
+            self.result_label.config(
+                text="No correct answer", fg="red", font=("Cambria", 14, "bold")
+            )
             self.incorrect_count += 1
         else:
             self.result_label.config(
                 text=f"Incorrect! The correct answer is {chr(65 + correct_option)}",
-                fg="red", font=('Cambria', 14, 'bold')
+                fg="red",
+                font=("Cambria", 14, "bold"),
             )
             self.incorrect_count += 1
 
