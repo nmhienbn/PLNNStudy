@@ -107,7 +107,7 @@ class QuizApp:
 
         for index, row in df.iterrows():
             cell_index = index + 2  # Adjust for zero-based index and header row
-            if not pd.isnull(row[0]):  # New question
+            if not pd.isnull(row.iloc[0]):  # New question
                 if current_question:  # Save the previous question
                     questions.append(
                         {
@@ -120,8 +120,8 @@ class QuizApp:
                     choices = []
                     correct_answer = None
 
-                current_question = row[1]
-            choices.append(row[2])
+                current_question = row.iloc[1]
+            choices.append(row.iloc[2])
             if self.get_correct_answer(
                 ws, cell_index, 3
             ):  # Check the color of the answer cell

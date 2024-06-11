@@ -85,7 +85,7 @@ def process_sheet(sheet, file_path):
 
     for index, row in df.iterrows():
         cell_index = index + 2  # Adjust for zero-based index and header row
-        if not pd.isnull(row[0]):  # New question
+        if not pd.isnull(row.iloc[0]):  # New question
             if current_question:  # Save the previous question
                 questions.append(
                     {
@@ -98,8 +98,8 @@ def process_sheet(sheet, file_path):
                 choices = []
                 correct_answer = None
 
-            current_question = row[1]
-        choices.append(row[2])
+            current_question = row.iloc[1]
+        choices.append(row.iloc[2])
         if get_correct_answer(ws, cell_index, 3):  # Check the color of the answer cell
             correct_answer = len(choices) - 1  # Update the correct answer index
 

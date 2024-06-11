@@ -1,31 +1,33 @@
 # PLNNStudy
+
 Để sử dụng, bạn cần cài các thư viện sau cho python:
 
 ## Ver 1: chỉ xlsx trong cmd
+![alt text](preview_cmd.png)
 
+```console
 pip install pandas
-
 pip install openpyxl
+```
 
 ## ver 2: UI cho xlsx
 
+```console
 pip install pandas
-
 pip install openpyxl
-
 pip install tk
+```
 
 ## ver 3: UI cho xlsx, docx
+![](preview_v3.png)
 
+```console
 pip install pandas
-
 pip install openpyxl
-
 pip install python-docx
-
 pip install Pillow
-
 pip install tk
+```
 
 
 **Chú ý:**
