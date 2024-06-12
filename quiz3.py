@@ -162,6 +162,7 @@ class QuizApp:
             self.load_questions()
 
     def load_questions(self):
+        self.all_questions = {}
         if self.file_path.endswith(".xlsx"):
             self.load_sheets()
         elif self.file_path.endswith(".docx"):
@@ -398,11 +399,11 @@ class QuizApp:
         self.retry_button.config(state=DISABLED)
 
     def submit_answer(self):
-        if self.options_var.get() == "" or self.options_var.get() == None:
-            messagebox.showwarning("Warning", "Please select an answer")
-            return
-
-        selected_option = int(self.options_var.get())
+        if isinstance(self.options_var.get(), int):
+            selected_option = int(self.options_var.get())
+        else:
+            selected_option = None
+            
         correct_option = self.questions[self.current_question_index]["correct_answer"]
 
         if selected_option == correct_option:
