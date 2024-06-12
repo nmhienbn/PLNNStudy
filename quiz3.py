@@ -34,14 +34,14 @@ class QuizApp:
         self.root.geometry(f"{width}x{height}+{x}+{y}")
 
     def init_ui(self):
-        self.file_label = Label(
-            self.root, text="No file selected", font=("Cambria", 12, "bold")
-        )
-        self.file_label.pack(pady=10)
-
         # Frame for Load File, Select Sheet, and Start Quiz buttons
         top_frame = Frame(self.root)
         top_frame.pack(pady=5)
+
+        self.file_label = Label(
+            top_frame, text="No file selected", font=("Cambria", 12, "bold")
+        )
+        self.file_label.pack(side=LEFT, padx=5)
 
         self.load_button = Button(
             top_frame, text="Load File", command=self.choose_file, font=("Cambria", 12)
@@ -57,23 +57,53 @@ class QuizApp:
         self.sheet_menu = OptionMenu(top_frame, self.sheet_var, [])
         self.sheet_menu.pack(side=LEFT, padx=5)
 
-        self.num_questions_label = Label(
-            top_frame, text="Number of questions:", font=("Cambria", 12)
-        )
-        self.num_questions_label.pack(side=LEFT, padx=5)
+        # self.num_questions_label = Label(
+        #     top_frame, text="Number of questions:", font=("Cambria", 12)
+        # )
+        # self.num_questions_label.pack(side=LEFT, padx=5)
 
-        self.num_questions_entry = Entry(
-            top_frame, font=("Cambria", 12), width=5
-        )
-        self.num_questions_entry.pack(side=LEFT, padx=5)
+        # self.num_questions_entry = Entry(
+        #     top_frame, font=("Cambria", 12), width=5
+        # )
+        # self.num_questions_entry.pack(side=LEFT, padx=5)
 
         self.total_questions_label = Label(
-            top_frame, text="", font=("Cambria", 12)
+            top_frame, text="Total: 0", font=("Cambria", 12)
         )
         self.total_questions_label.pack(side=LEFT, padx=5)
 
+        # Frame for question range and shuffle option
+        middle_frame = Frame(self.root)
+        middle_frame.pack(pady=5)
+
+        self.start_question_label = Label(
+            middle_frame, text="From:", font=("Cambria", 12)
+        )
+        self.start_question_label.pack(side=LEFT, padx=5)
+
+        self.start_question_entry = Entry(
+            middle_frame, font=("Cambria", 12), width=5
+        )
+        self.start_question_entry.pack(side=LEFT, padx=5)
+
+        self.end_question_label = Label(
+            middle_frame, text="To:", font=("Cambria", 12)
+        )
+        self.end_question_label.pack(side=LEFT, padx=5)
+
+        self.end_question_entry = Entry(
+            middle_frame, font=("Cambria", 12), width=5
+        )
+        self.end_question_entry.pack(side=LEFT, padx=5)
+
+        self.shuffle_var = BooleanVar(value=True)  # Default is True
+        self.shuffle_check = Checkbutton(
+            middle_frame, text="Shuffle Questions", variable=self.shuffle_var, font=("Cambria", 12)
+        )
+        self.shuffle_check.pack(side=LEFT, padx=5)
+
         self.start_button = Button(
-            top_frame, text="Start Quiz", command=self.start_quiz, font=("Cambria", 12)
+            middle_frame, text="Start Quiz", command=self.start_quiz, font=("Cambria", 12)
         )
         self.start_button.pack(side=LEFT, padx=5)
 
@@ -122,6 +152,7 @@ class QuizApp:
         self.result_label = Label(self.root, text="")
         self.result_label.pack(pady=10)
 
+
     def choose_file(self):
         self.file_path = filedialog.askopenfilename(
             filetypes=[("Word and Excel files", "*.docx *.xlsx")]
@@ -135,6 +166,8 @@ class QuizApp:
             self.load_sheets()
         elif self.file_path.endswith(".docx"):
             self.load_word_document()
+            total_questions = sum(len(all_questions) for all_questions in self.all_questions.values())
+            self.total_questions_label.config(text=f"Total: {total_questions}")
 
     def load_sheets(self):
         xls = pd.ExcelFile(self.file_path)
@@ -147,8 +180,14 @@ class QuizApp:
         menu.delete(0, "end")
         for sheet in xls.sheet_names:
             menu.add_command(
-                label=sheet, command=lambda value=sheet: self.sheet_var.set(value)
+                label=sheet, command=lambda value=sheet: self.on_sheet_select(value)
             )
+
+    def on_sheet_select(self, value):
+        self.sheet_var.set(value)
+        total_questions = len(self.all_questions[value])
+        self.total_questions_label.config(text=f"Total: {total_questions}")
+
 
     def process_sheet(self, sheet, file_path):
         df = pd.read_excel(file_path, sheet)
@@ -264,17 +303,42 @@ class QuizApp:
             messagebox.showerror("Error", "Please select a sheet")
             return
         self.questions = self.all_questions[selected_sheet]
-        
+
         # Get number of questions to ask
-        num_questions_str = self.num_questions_entry.get()
-        if num_questions_str.isdigit():
-            num_questions = int(num_questions_str)
-            if num_questions > len(self.questions):
-                num_questions = len(self.questions)
-        else:
-            num_questions = len(self.questions)
+        num_questions = len(self.questions)
+        # num_questions_str = self.num_questions_entry.get()
+        # if num_questions_str.isdigit():
+        #     num_questions = int(num_questions_str)
+        # else:
+        #     num_questions = len(self.questions)
         
-        self.questions = random.sample(self.questions, num_questions)
+        # Get start and end questions
+        start_question_str = self.start_question_entry.get()
+        end_question_str = self.end_question_entry.get()
+        if start_question_str.isdigit():
+            start_question = int(start_question_str) - 1  # Adjust for zero-based index
+        else:
+            start_question = 0
+
+        if end_question_str.isdigit():
+            end_question = int(end_question_str)
+        else:
+            end_question = len(self.questions)
+        
+        if start_question < 0 or end_question > len(self.questions) or start_question >= end_question:
+            messagebox.showerror("Error", "Invalid question range")
+            return
+        
+        self.questions = self.questions[start_question:end_question]
+        
+        if num_questions > len(self.questions):
+            num_questions = len(self.questions)
+
+        self.questions = self.questions[:num_questions]  # Select the required number of questions
+        
+        if self.shuffle_var.get():  # Check if shuffle is enabled
+            self.questions = random.sample(self.questions, len(self.questions))
+        
         self.current_question_index = 0
         self.incorrect_count = 0
         self.incorrect_questions = []
@@ -388,11 +452,13 @@ class QuizApp:
 
     def retry_incorrect(self):
         self.questions = self.incorrect_questions
-        random.shuffle(self.questions)
+        if self.shuffle_var.get():  # Check if shuffle is enabled
+            random.shuffle(self.questions)
         self.current_question_index = 0
         self.incorrect_count = 0
         self.incorrect_questions = []
         self.display_question()
+
 
 
 if __name__ == "__main__":
