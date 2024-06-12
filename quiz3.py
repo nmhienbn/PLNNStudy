@@ -399,31 +399,33 @@ class QuizApp:
         self.retry_button.config(state=DISABLED)
 
     def submit_answer(self):
-        if isinstance(self.options_var.get(), int):
-            selected_option = int(self.options_var.get())
-        else:
-            selected_option = None
-            
+        selected_option = self.options_var.get()
         correct_option = self.questions[self.current_question_index]["correct_answer"]
 
-        if selected_option == correct_option:
+        print(type(selected_option))
+        if (selected_option is None) or (selected_option == "") or (selected_option == "None"):
             self.result_label.config(
-                text="Correct!", fg="green", font=("Cambria", 14, "bold")
-            )
-        elif correct_option is None:
-            self.result_label.config(
-                text="No correct answer", fg="red", font=("Cambria", 14, "bold")
-            )
-            self.incorrect_count += 1
-            self.incorrect_questions.append(self.questions[self.current_question_index])
-        else:
-            self.result_label.config(
-                text=f"Incorrect! The correct answer is {chr(65 + correct_option)}",
+                text=f"Incorrect! The correct answer is {chr(65 + correct_option)}" if correct_option is not None else "Incorrect! There is no correct answer for this question.",
                 fg="red",
                 font=("Cambria", 14, "bold"),
             )
             self.incorrect_count += 1
             self.incorrect_questions.append(self.questions[self.current_question_index])
+        else:
+            print(selected_option)
+            selected_option = int(selected_option)
+            if selected_option == correct_option:
+                self.result_label.config(
+                    text="Correct!", fg="green", font=("Cambria", 14, "bold")
+                )
+            else:
+                self.result_label.config(
+                    text=f"Incorrect! The correct answer is {chr(65 + correct_option)}" if correct_option is not None else "Incorrect! There is no correct answer for this question.",
+                    fg="red",
+                    font=("Cambria", 14, "bold"),
+                )
+                self.incorrect_count += 1
+                self.incorrect_questions.append(self.questions[self.current_question_index])
 
         self.submit_button.config(state=DISABLED)
         self.next_button.config(state=NORMAL)
