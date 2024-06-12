@@ -57,15 +57,15 @@ class QuizApp:
         self.sheet_menu = OptionMenu(top_frame, self.sheet_var, [])
         self.sheet_menu.pack(side=LEFT, padx=5)
 
-        # self.num_questions_label = Label(
-        #     top_frame, text="Number of questions:", font=("Cambria", 12)
-        # )
-        # self.num_questions_label.pack(side=LEFT, padx=5)
+        self.num_questions_label = Label(
+            top_frame, text="Num. ques:", font=("Cambria", 12)
+        )
+        self.num_questions_label.pack(side=LEFT, padx=5)
 
-        # self.num_questions_entry = Entry(
-        #     top_frame, font=("Cambria", 12), width=5
-        # )
-        # self.num_questions_entry.pack(side=LEFT, padx=5)
+        self.num_questions_entry = Entry(
+            top_frame, font=("Cambria", 12), width=5
+        )
+        self.num_questions_entry.pack(side=LEFT, padx=5)
 
         self.total_questions_label = Label(
             top_frame, text="Total: 0", font=("Cambria", 12)
@@ -98,7 +98,7 @@ class QuizApp:
 
         self.shuffle_var = BooleanVar(value=True)  # Default is True
         self.shuffle_check = Checkbutton(
-            middle_frame, text="Shuffle Questions", variable=self.shuffle_var, font=("Cambria", 12)
+            middle_frame, text="Shuffle Ques", variable=self.shuffle_var, font=("Cambria", 12)
         )
         self.shuffle_check.pack(side=LEFT, padx=5)
 
@@ -306,12 +306,12 @@ class QuizApp:
         self.questions = self.all_questions[selected_sheet]
 
         # Get number of questions to ask
-        num_questions = len(self.questions)
-        # num_questions_str = self.num_questions_entry.get()
-        # if num_questions_str.isdigit():
-        #     num_questions = int(num_questions_str)
-        # else:
-        #     num_questions = len(self.questions)
+        # num_questions = len(self.questions)
+        num_questions_str = self.num_questions_entry.get()
+        if num_questions_str.isdigit():
+            num_questions = int(num_questions_str)
+        else:
+            num_questions = len(self.questions)
         
         # Get start and end questions
         start_question_str = self.start_question_entry.get()
@@ -402,7 +402,6 @@ class QuizApp:
         selected_option = self.options_var.get()
         correct_option = self.questions[self.current_question_index]["correct_answer"]
 
-        print(type(selected_option))
         if (selected_option is None) or (selected_option == "") or (selected_option == "None"):
             self.result_label.config(
                 text=f"Incorrect! The correct answer is {chr(65 + correct_option)}" if correct_option is not None else "Incorrect! There is no correct answer for this question.",
@@ -412,7 +411,6 @@ class QuizApp:
             self.incorrect_count += 1
             self.incorrect_questions.append(self.questions[self.current_question_index])
         else:
-            print(selected_option)
             selected_option = int(selected_option)
             if selected_option == correct_option:
                 self.result_label.config(
